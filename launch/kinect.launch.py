@@ -11,26 +11,35 @@ def generate_launch_description():
 
     namespace = LaunchConfiguration("namespace")
 
+    kinect_namespace = [namespace, "/kinect"]
+
     return LaunchDescription([
         ComposableNodeContainer(
             name="kinect_component",
             namespace=namespace,
             package="rclcpp_components",
             # MAYDO: switch to component_container_mt and provide "thread_num" parameter
-            executable="component_container",
+            executable="component_container_mt",
+            parameters=[{
+                "thread_num": 4
+            }],
             composable_node_descriptions=[
                 ComposableNode(
                     package="kinect_stack2",
                     plugin="KinectNode",
                     name="kinect_node",
-                    namespace=namespace,
+                    namespace=kinect_namespace,
+                    parameters=[{
+                        "rgb_frame": [namespace, "/kinect_rgb_optical_frame"],
+                        "depth_frame": [namespace, "/kinect_depth_optical_frame"],
+                    }],
                     extra_arguments=[{"use_intra_process_comms": True}]
                 ),
                 ComposableNode(
                     package="depth_image_proc",
                     plugin="depth_image_proc::ConvertMetricNode",
                     name="kinect_convert_metric",
-                    namespace=namespace,
+                    namespace=kinect_namespace,
                     remappings=[
                         ("image_raw", "depth/image_raw"),
                         ("image", "depth/image_metric")
@@ -41,7 +50,7 @@ def generate_launch_description():
                     package="depth_image_proc",
                     plugin="depth_image_proc::RegisterNode",
                     name="kinect_depth_register",
-                    namespace=namespace,
+                    namespace=kinect_namespace,
                     remappings=[
                         # rgb/camera_info
                         # depth/camera_info
@@ -60,7 +69,7 @@ def generate_launch_description():
                 #     package="depth_image_proc",
                 #     plugin="depth_image_proc::PointCloudXyzrgbNode",
                 #     name="kinect_rgb_pcl",
-                #     namespace=namespace,
+                #     namespace=kinect_namespace,
                 #     remappings=[
                 #         # rgb/camera_info
                 #         # depth/camera_info
@@ -74,7 +83,7 @@ def generate_launch_description():
         Node(
             package="depth_image_proc",
             executable="point_cloud_xyzrgb_node",
-            namespace=namespace,
+            namespace=kinect_namespace,
             remappings=[
                 # rgb/camera_info
                 # depth/camera_info
