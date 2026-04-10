@@ -39,4 +39,5 @@ private:
 
     std::thread kinect_thread_;
     rclcpp::TimerBase::SharedPtr timer_;
+    uint8_t *rgb_buffer;
 };

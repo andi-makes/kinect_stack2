@@ -7,9 +7,13 @@ using namespace std::chrono_literals;
 
 KinectNode::KinectNode(const rclcpp::NodeOptions& options)
 : Node("kinect_node", options) {
+    // adapted from libfreenect glview
+    this->rgb_buffer = (uint8_t*)malloc(640*480*3);
+    // ros parameters
     this->declare_parameter("rgb_frame", "kinect_rgb_optical_frame");
     this->declare_parameter("depth_frame", "kinect_depth_optical_frame");
 
+    // ros publishers and subscribers
     this->depth_pub_ = image_transport::create_camera_publisher(this, "depth/image_raw");
     this->rgb_pub_ = image_transport::create_camera_publisher(this, "rgb/image_raw");
     this->tilt_pub_ = create_publisher<std_msgs::msg::Float64>("current_tilt_degree", 10);
@@ -74,14 +78,15 @@ KinectNode::KinectNode(const rclcpp::NodeOptions& options)
 
     // Set modes
     freenect_frame_mode rgb_mode = freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_VIDEO_RGB);
-    freenect_frame_mode depth_mode = freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_MM);
+    freenect_frame_mode depth_mode = freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_REGISTERED);
     freenect_set_video_mode(dev_, rgb_mode);
     freenect_set_depth_mode(dev_, depth_mode);
+    freenect_set_video_buffer(dev_, this->rgb_buffer);
 
     // Enable automatic exposure
-    freenect_set_flag(dev_, FREENECT_AUTO_EXPOSURE, FREENECT_ON);
-    freenect_set_flag(dev_, FREENECT_AUTO_FLICKER, FREENECT_ON);
-    freenect_set_flag(dev_, FREENECT_AUTO_WHITE_BALANCE, FREENECT_ON);
+    //freenect_set_flag(dev_, FREENECT_AUTO_EXPOSURE, FREENECT_ON);
+    //freenect_set_flag(dev_, FREENECT_AUTO_FLICKER, FREENECT_ON);
+    //freenect_set_flag(dev_, FREENECT_AUTO_WHITE_BALANCE, FREENECT_ON);
 
     // Start streams
     freenect_start_video(dev_);
@@ -113,6 +118,7 @@ void KinectNode::timer_callback() {
 
 KinectNode::~KinectNode()
 {
+    free(this->rgb_buffer);
     freenect_stop_video(dev_);
     freenect_stop_depth(dev_);
     freenect_close_device(dev_);

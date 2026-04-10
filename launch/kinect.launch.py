@@ -65,29 +65,29 @@ def generate_launch_description():
                 # consider handling the MAYDO above and re-integrate the component
                 # into a multithreaded container.
 
-                # ComposableNode(
-                #     package="depth_image_proc",
-                #     plugin="depth_image_proc::PointCloudXyzrgbNode",
-                #     name="kinect_rgb_pcl",
-                #     namespace=kinect_namespace,
-                #     remappings=[
-                #         # rgb/camera_info
-                #         # depth/camera_info
-                #         ("rgb/image_rect_color", "rgb/image_raw")
-                #     ],
-                #     extra_arguments=[{"use_intra_process_comms": True}]
-                # ),
+                ComposableNode(
+                    package="depth_image_proc",
+                    plugin="depth_image_proc::PointCloudXyzrgbNode",
+                    name="kinect_rgb_pcl",
+                    namespace=kinect_namespace,
+                    remappings=[
+                        # rgb/camera_info
+                        # depth/camera_info
+                        ("rgb/image_rect_color", "rgb/image_raw")
+                    ],
+                    extra_arguments=[{"use_intra_process_comms": True}]
+                ),
             ]
         ),
         # See comment above (:52) for why this is its own node.
-        Node(
-            package="depth_image_proc",
-            executable="point_cloud_xyzrgb_node",
-            namespace=kinect_namespace,
-            remappings=[
-                # rgb/camera_info
-                # depth/camera_info
-                ("rgb/image_rect_color", "rgb/image_raw")
-            ],
-        ),
+        #Node(
+        #    package="depth_image_proc",
+        #    executable="point_cloud_xyzrgb_node",
+        #    namespace=kinect_namespace,
+        #    remappings=[
+        #        # rgb/camera_info
+        #        # depth/camera_info
+        #        ("rgb/image_rect_color", "rgb/image_raw")
+        #    ],
+        #),
     ])
