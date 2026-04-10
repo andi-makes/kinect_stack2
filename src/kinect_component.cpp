@@ -33,7 +33,7 @@ KinectNode::KinectNode(const rclcpp::NodeOptions& options)
     rgb_info_.header.frame_id = this->get_parameter("rgb_frame").as_string();
 
     depth_info_ = depth_info_manager_->getCameraInfo();
-    depth_info_.header.frame_id = this->get_parameter("depth_frame").as_string();
+    depth_info_.header.frame_id = this->get_parameter("rgb_frame").as_string();
         
     tilt_sub_ = create_subscription<std_msgs::msg::Float64>(
         "set_tilt_degree", 10,
@@ -149,7 +149,7 @@ void KinectNode::depth_cb(freenect_device *dev, void *depth, uint32_t /*timestam
     sensor_msgs::msg::Image msg;
     auto stamp = node->now();
     msg.header.stamp = stamp;
-    msg.header.frame_id = node->get_parameter("depth_frame").as_string();
+    msg.header.frame_id = node->get_parameter("rgb_frame").as_string();
     msg.height = 480;
     msg.width = 640;
     msg.encoding = sensor_msgs::image_encodings::TYPE_16UC1;

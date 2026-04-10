@@ -42,22 +42,22 @@ def generate_launch_description():
                     namespace=kinect_namespace,
                     remappings=[
                         ("image_raw", "depth/image_raw"),
-                        ("image", "depth/image_metric")
+                        ("image", "depth_registered/image_rect") # skip the RegisterNode, because the kinect does it for us
                     ],
                     extra_arguments=[{"use_intra_process_comms": True}]
                 ),
-                ComposableNode(
-                    package="depth_image_proc",
-                    plugin="depth_image_proc::RegisterNode",
-                    name="kinect_depth_register",
-                    namespace=kinect_namespace,
-                    remappings=[
-                        # rgb/camera_info
-                        # depth/camera_info
-                        ("depth/image_rect", "depth/image_metric")
-                    ],
-                    extra_arguments=[{"use_intra_process_comms": True}]
-                ),
+                #ComposableNode(
+                #    package="depth_image_proc",
+                #    plugin="depth_image_proc::RegisterNode",
+                #    name="kinect_depth_register",
+                #    namespace=kinect_namespace,
+                #    remappings=[
+                #        # rgb/camera_info
+                #        # depth/camera_info
+                #        ("depth/image_rect", "depth/image_metric")
+                #    ],
+                #    extra_arguments=[{"use_intra_process_comms": True}]
+                #),
                 # There was a problem with calculating the xyzrgb pcl in the same container.
                 # This is most likely due to the single threaded containter used.
                 # For now, just spawning the component as a node outside seems to work fine.
